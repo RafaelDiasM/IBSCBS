@@ -1,0 +1,22 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/calcular"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "valor": 2500,
+      "tipoDocumento": "nfe",
+      "ufDestino": "SP",
+      "municipioDestino": 3550308,
+      "data": "2027-01-01",
+      "ncm": "24021000",
+      "cst": "000",
+      "cClassTrib": "000001",
+      "valorFrete": 50,
+      "valorSeguro": 10,
+      "valorDesconto": 0
+    }
+order: 1000

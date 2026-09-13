@@ -1,0 +1,226 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "IBS/CBS EasyAPI - Gateway Inteligente da Reforma Tributária",
+    "version": "1.0.0",
+    "description": "API Wrapper corporativa de alto desempenho para sistemas ERP e escritórios de contabilidade. Implementa as regras de cálculo do IBS (Estadual e Municipal), CBS (Federal) e Imposto Seletivo conforme a Lei Complementar nº 214/2025 e Emenda Constitucional nº 132/2023. Compatibilidade drop-in com a API da Receita Federal e Nota Técnica v1.30 da RTC.",
+    "contact": {
+      "name": "Suporte EasyAPI RTC",
+      "url": "https://github.com/ibscbs-easyapi"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Servidor Local de Homologação EasyAPI"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Módulo ERP & Emissão Fiscal",
+      "description": "Endpoints para desenvolvedores de software ERP (cálculo de notas, geração de XML e injeção de tags RTC na NF-e)"
+    },
+    {
+      "name": "Módulo Contábil & Auditoria Fiscal",
+      "description": "Cálculo analítico, memórias de cálculo fundamentadas na LC 214/2025 e comparativo com o sistema legado"
+    },
+    {
+      "name": "Tabelas Oficiais & Dados Abertos",
+      "description": "Consultas a UFs, municípios, NCMs, CSTs e tabela oficial de classificações tributárias (cClassTrib)"
+    },
+    {
+      "name": "Observabilidade & Gateway",
+      "description": "Monitoramento de integridade, latência e status de conexão com os servidores da Receita Federal"
+    }
+  ],
+  "paths": {
+    "/api/calculadora/regime-geral": {
+      "post": {
+        "tags": ["Módulo ERP & Emissão Fiscal"],
+        "summary": "1. Calcular Tributos RTC (Regime Geral - Drop-in Oficial)",
+        "description": "Endpoint idêntico ao da Calculadora da Receita Federal (/api/calculadora/regime-geral). Calcula CBS, IBS Estadual/Municipal e Imposto Seletivo, com suporte a tributação regular vinculada a suspensões (CST 550).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dhFatoGerador": { "type": "string", "example": "2027-01-01T03:00:00-03:00" },
+                  "uf": { "type": "string", "example": "RS" },
+                  "municipio": { "type": "integer", "example": 4314902 },
+                  "itens": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "numero": { "type": "integer", "example": 1 },
+                        "ncm": { "type": "string", "example": "24021000" },
+                        "quantidade": { "type": "number", "example": 222 },
+                        "unidade": { "type": "string", "example": "VN" },
+                        "cst": { "type": "string", "example": "550" },
+                        "baseCalculo": { "type": "number", "example": 1111.0 },
+                        "cClassTrib": { "type": "string", "example": "550020" },
+                        "tributacaoRegular": {
+                          "type": "object",
+                          "properties": {
+                            "cst": { "type": "string", "example": "200" },
+                            "cClassTrib": { "type": "string", "example": "200032" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Tributos calculados com sucesso conforme regras da RTC" }
+        }
+      }
+    },
+    "/api/calculadora/xml/generate": {
+      "post": {
+        "tags": ["Módulo ERP & Emissão Fiscal"],
+        "summary": "2. Gerar Grupos XML da RTC (Nota Técnica v1.30)",
+        "description": "Recebe o resultado do cálculo e gera o trecho XML estruturado com os grupos <IBSCBS>, <IS>, <IBSCBSTot> e <ISTot> prontos para inclusão no documento fiscal eletrônico.",
+        "parameters": [
+          { "name": "tipo", "in": "query", "schema": { "type": "string", "default": "nfe" }, "description": "Modelo de documento (nfe, nfce, nfse, cte)" }
+        ],
+        "responses": {
+          "200": { "description": "XML estruturado da RTC gerado com sucesso", "content": { "application/xml": {} } }
+        }
+      }
+    },
+    "/api/calculadora/xml/validate": {
+      "post": {
+        "tags": ["Módulo ERP & Emissão Fiscal"],
+        "summary": "3. Validar Estrutura do XML Gerado",
+        "description": "Valida se o XML dos grupos da RTC obedece às regras de validação estrutural e de negócio da Nota Técnica v1.30.",
+        "parameters": [
+          { "name": "tipo", "in": "query", "schema": { "type": "string", "default": "nfe" } },
+          { "name": "subtipo", "in": "query", "schema": { "type": "string", "default": "grupo" } }
+        ],
+        "responses": {
+          "200": { "description": "XML validado com sucesso" }
+        }
+      }
+    },
+    "/api/v1/xml/injetar-dfe": {
+      "post": {
+        "tags": ["Módulo ERP & Emissão Fiscal"],
+        "summary": "4. Injetar Grupos RTC no XML da NF-e Original",
+        "description": "Recebe a NF-e original gerada pelo ERP (sem RTC) e o XML dos grupos calculados, devolvendo a NF-e completa pronta para assinatura e transmissão à SEFAZ.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "xmlRtc": { "type": "string", "description": "XML dos grupos RTC" },
+                  "xmlNfeOriginal": { "type": "string", "description": "XML original da NF-e sem RTC" }
+                },
+                "required": ["xmlRtc", "xmlNfeOriginal"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "NF-e enriquecida com a RTC retornada com sucesso" }
+        }
+      }
+    },
+    "/api/v1/calcular": {
+      "post": {
+        "tags": ["Módulo Contábil & Auditoria Fiscal"],
+        "summary": "Cálculo Fiscal Analítico com Memória & Comparativo Legado",
+        "description": "Projetado para contadores e analistas tributários. Realiza o cálculo detalhado de CBS, IBS Estadual/Municipal e Imposto Seletivo, informando a base legal exata de cada benefício (LC 214/2025) e estimando o impacto de carga em relação ao PIS, COFINS, ICMS e ISS.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "valor": { "type": "number", "example": 2500.0 },
+                  "tipoDocumento": { "type": "string", "enum": ["nfe", "nfce", "nfse", "cte", "mdfe", "bpe", "nf3e"], "example": "nfe" },
+                  "ufDestino": { "type": "string", "example": "SP" },
+                  "municipioDestino": { "type": "integer", "example": 3550308 },
+                  "data": { "type": "string", "example": "2027-01-01" },
+                  "ncm": { "type": "string", "example": "24021000" },
+                  "cst": { "type": "string", "example": "000" },
+                  "cClassTrib": { "type": "string", "example": "000001" },
+                  "valorFrete": { "type": "number", "example": 50.0 },
+                  "valorSeguro": { "type": "number", "example": 10.0 },
+                  "valorDesconto": { "type": "number", "example": 0.0 }
+                },
+                "required": ["valor", "ufDestino", "municipioDestino"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Relatório fiscal analítico gerado com sucesso" }
+        }
+      }
+    },
+    "/api/v1/dados-abertos/classificacoes-tributarias": {
+      "get": {
+        "tags": ["Tabelas Oficiais & Dados Abertos"],
+        "summary": "Listar Classificações Tributárias (cClassTrib - 6 Dígitos)",
+        "description": "Consulta o catálogo oficial de classificações tributárias regulamentadas pelos Anexos da LC 214/2025. Permite filtrar por CST.",
+        "parameters": [
+          { "name": "cst", "in": "query", "schema": { "type": "string" }, "example": "200", "description": "Código da Situação Tributária (ex: 000, 200, 210, 220, 550)" }
+        ],
+        "responses": {
+          "200": { "description": "Lista de classificações oficiais retornada com sucesso" }
+        }
+      }
+    },
+    "/api/v1/dados-abertos/csts": {
+      "get": {
+        "tags": ["Tabelas Oficiais & Dados Abertos"],
+        "summary": "Listar os 17 CSTs Oficiais da Reforma Tributária",
+        "description": "Retorna todos os Códigos de Situação Tributária (CST) estabelecidos pela RTC com descrição, fundamentação legal e fatores de redução.",
+        "responses": {
+          "200": { "description": "Lista de CSTs" }
+        }
+      }
+    },
+    "/api/v1/dados-abertos/ncm": {
+      "get": {
+        "tags": ["Tabelas Oficiais & Dados Abertos"],
+        "summary": "Consultar NCM e Incidência de Imposto Seletivo",
+        "description": "Verifica se uma NCM está sujeita ao Imposto Seletivo (Sin Tax) e retorna alíquotas ad valorem e ad rem.",
+        "parameters": [
+          { "name": "ncm", "in": "query", "required": true, "schema": { "type": "string" }, "example": "24021000" },
+          { "name": "data", "in": "query", "schema": { "type": "string" }, "example": "2027-01-01" }
+        ],
+        "responses": {
+          "200": { "description": "Dados da NCM" }
+        }
+      }
+    },
+    "/api/v1/dados-abertos/cronograma": {
+      "get": {
+        "tags": ["Tabelas Oficiais & Dados Abertos"],
+        "summary": "Cronograma de Transição da Reforma (2026 a 2033)",
+        "description": "Retorna as alíquotas e marcos temporais de cada ano da reforma conforme a EC 132/2023.",
+        "responses": {
+          "200": { "description": "Cronograma oficial" }
+        }
+      }
+    },
+    "/api/v1/observabilidade/health": {
+      "tags": ["Observabilidade & Gateway"],
+      "summary": "Saúde do Gateway e Conexão com a Receita Federal",
+      "description": "Verifica o status operacional do gateway EasyAPI e a conectividade com o servidor do governo.",
+      "responses": {
+        "200": { "description": "Status de saúde operacional" }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+# Use this workspace to collaborate
+workspace:
+  id: c8fc49ba-bb32-42e0-8b0b-f98573d11007
+
+localResources:
+  collections:
+    - ../ibscbs-easyapi.postman_collection.json
+  specs:
+    - ../server/src/docs/openapi.json
+
+cloudResources:
+  collections:
+    ../postman/collections/IBS-CBS EasyAPI - Coleção Oficial (ERPs & Contabilidade): 3fb49151-e3a8-46cf-bf24-9e2dcd27818e

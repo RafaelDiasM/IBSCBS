@@ -1,0 +1,219 @@
+{
+  "info": {
+    "_postman_id": "ibscbs-easyapi-rtc-v1",
+    "name": "IBS/CBS EasyAPI - Coleção Oficial (ERPs & Contabilidade)",
+    "description": "Coleção de testes e integração para a Reforma Tributária do Consumo (LC 214/2025 e EC 132/2023). Contém o fluxo completo dos 4 passos de emissão de NF-e com RTC e cálculos analíticos para contabilidade.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Módulo ERP (Passos 1 a 4 do Governo)",
+      "item": [
+        {
+          "name": "Passo 1: Calcular Tributos RTC (Drop-in Oficial)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dhFatoGerador\": \"2027-01-01T03:00:00-03:00\",\n  \"uf\": \"RS\",\n  \"municipio\": 4314902,\n  \"itens\": [\n    {\n      \"numero\": 1,\n      \"ncm\": \"24021000\",\n      \"quantidade\": 222,\n      \"unidade\": \"VN\",\n      \"cst\": \"550\",\n      \"baseCalculo\": 1111,\n      \"cClassTrib\": \"550020\",\n      \"tributacaoRegular\": {\n        \"cst\": \"200\",\n        \"cClassTrib\": \"200032\"\n      },\n      \"impostoSeletivo\": {\n        \"cst\": \"000\",\n        \"baseCalculo\": 1111,\n        \"cClassTrib\": \"000001\",\n        \"unidade\": \"VN\",\n        \"quantidade\": 222,\n        \"impostoInformado\": 0\n      }\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/calculadora/regime-geral",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "calculadora", "regime-geral"]
+            }
+          }
+        },
+        {
+          "name": "Passo 2: Gerar Grupos XML RTC (NT v1.30)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/xml" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cst\": \"550\",\n  \"cClassTrib\": \"550020\",\n  \"baseCalculo\": 5984.03,\n  \"aliquotaCBS\": 0.0,\n  \"aliquotaIBSUF\": 0.0,\n  \"aliquotaIBSMun\": 0.0,\n  \"valorIS\": 4873.03,\n  \"cstIS\": \"000\",\n  \"cClassTribIS\": \"000001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/calculadora/xml/generate?tipo=nfe",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "calculadora", "xml", "generate"],
+              "query": [{ "key": "tipo", "value": "nfe" }]
+            }
+          }
+        },
+        {
+          "name": "Passo 3: Validar Grupos XML da RTC",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/xml" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gruposRTC tipo=\"nfe\" versao=\"1.30\" xmlns=\"http://www.portalfiscal.inf.br/nfe\">\n  <IBSCBS>\n    <CST>000</CST>\n    <cClassTrib>000001</cClassTrib>\n    <gIBSCBS>\n      <vBC>1000.00</vBC>\n      <gCBS>\n        <pCBS>8.40</pCBS>\n        <vCBS>84.00</vCBS>\n      </gCBS>\n      <gIBSUF>\n        <pIBSUF>0.10</pIBSUF>\n        <vIBSUF>1.00</vIBSUF>\n      </gIBSUF>\n      <vIBS>1.00</vIBS>\n    </gIBSCBS>\n  </IBSCBS>\n</gruposRTC>"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/calculadora/xml/validate?tipo=nfe&subtipo=grupo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "calculadora", "xml", "validate"],
+              "query": [
+                { "key": "tipo", "value": "nfe" },
+                { "key": "subtipo", "value": "grupo" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Passo 4: Injetar RTC na NF-e Original",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"xmlRtc\": \"<IBSCBS><CST>000</CST><cClassTrib>000001</cClassTrib><gIBSCBS><vBC>1000.00</vBC><gCBS><pCBS>8.40</pCBS><vCBS>84.00</vCBS></gCBS><gIBSUF><pIBSUF>0.10</pIBSUF><vIBSUF>1.00</vIBSUF></gIBSUF><vIBS>1.00</vIBS></gIBSCBS></IBSCBS>\",\n  \"xmlNfeOriginal\": \"<NFe xmlns=\\\"http://www.portalfiscal.inf.br/nfe\\\"><infNFe Id=\\\"NFe123\\\" versao=\\\"4.00\\\"><det nItem=\\\"1\\\"><imposto></imposto></det><total><ICMSTot></ICMSTot></total></infNFe></NFe>\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/xml/injetar-dfe",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "xml", "injetar-dfe"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Módulo Contabilidade & Auditoria Fiscal",
+      "item": [
+        {
+          "name": "Cálculo Fiscal Analítico (com Memória & Comparativo Legado)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"valor\": 2500,\n  \"tipoDocumento\": \"nfe\",\n  \"ufDestino\": \"SP\",\n  \"municipioDestino\": 3550308,\n  \"data\": \"2027-01-01\",\n  \"ncm\": \"24021000\",\n  \"cst\": \"000\",\n  \"cClassTrib\": \"000001\",\n  \"valorFrete\": 50,\n  \"valorSeguro\": 10,\n  \"valorDesconto\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calcular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calcular"]
+            }
+          }
+        },
+        {
+          "name": "Consultar Classificações Fiscais (cClassTrib - Redução 60%)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dados-abertos/classificacoes-tributarias?cst=200",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dados-abertos", "classificacoes-tributarias"],
+              "query": [{ "key": "cst", "value": "200" }]
+            }
+          }
+        },
+        {
+          "name": "Listar os 17 CSTs Oficiais da Reforma",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dados-abertos/csts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dados-abertos", "csts"]
+            }
+          }
+        },
+        {
+          "name": "Consultar NCM e Incidência de Imposto Seletivo",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dados-abertos/ncm?ncm=24021000",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dados-abertos", "ncm"],
+              "query": [{ "key": "ncm", "value": "24021000" }]
+            }
+          }
+        },
+        {
+          "name": "Cronograma de Transição 2026 a 2033",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dados-abertos/cronograma",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dados-abertos", "cronograma"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Observabilidade & Saúde da API",
+      "item": [
+        {
+          "name": "Health Check do Gateway & Servidor Governo",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/observabilidade/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "observabilidade", "health"]
+            }
+          }
+        },
+        {
+          "name": "Glossário de Erros Traduzidos da Reforma",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/observabilidade/erros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "observabilidade", "erros"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Módulo Desenvolvedores & Gerador de SDKs",
+      "item": [
+        {
+          "name": "Gerador de Código e Snippets (C#, Python, PHP, JS, Go, cURL)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"endpoint\": \"/api/v1/calcular\",\n  \"method\": \"POST\",\n  \"payload\": {\n    \"valor\": 1500.0,\n    \"ncm\": \"24021000\",\n    \"ufDestino\": \"SP\",\n    \"municipioDestino\": 3550308,\n    \"data\": \"2027-01-01\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/sdk/snippets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "sdk", "snippets"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

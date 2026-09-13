@@ -1,0 +1,14 @@
+$kind: http-request
+name: "Passo 4: Injetar RTC na NF-e Original"
+url: "{{baseUrl}}/api/v1/xml/injetar-dfe"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "xmlRtc": "<IBSCBS><CST>000</CST><cClassTrib>000001</cClassTrib><gIBSCBS><vBC>1000.00</vBC><gCBS><pCBS>8.40</pCBS><vCBS>84.00</vCBS></gCBS><gIBSUF><pIBSUF>0.10</pIBSUF><vIBSUF>1.00</vIBSUF></gIBSUF><vIBS>1.00</vIBS></gIBSCBS></IBSCBS>",
+      "xmlNfeOriginal": "<NFe xmlns=\"http://www.portalfiscal.inf.br/nfe\"><infNFe Id=\"NFe123\" versao=\"4.00\"><det nItem=\"1\"><imposto></imposto></det><total><ICMSTot></ICMSTot></total></infNFe></NFe>"
+    }
+order: 4000

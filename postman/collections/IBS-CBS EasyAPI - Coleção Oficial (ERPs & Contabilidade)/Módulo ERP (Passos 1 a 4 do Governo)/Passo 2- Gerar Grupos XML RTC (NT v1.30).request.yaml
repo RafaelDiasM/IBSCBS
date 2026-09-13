@@ -1,0 +1,24 @@
+$kind: http-request
+name: "Passo 2: Gerar Grupos XML RTC (NT v1.30)"
+url: "{{baseUrl}}/api/calculadora/xml/generate?tipo=nfe"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/xml
+queryParams:
+  tipo: nfe
+body:
+  type: text
+  content: |-
+    {
+      "cst": "550",
+      "cClassTrib": "550020",
+      "baseCalculo": 5984.03,
+      "aliquotaCBS": 0.0,
+      "aliquotaIBSUF": 0.0,
+      "aliquotaIBSMun": 0.0,
+      "valorIS": 4873.03,
+      "cstIS": "000",
+      "cClassTribIS": "000001"
+    }
+order: 2000

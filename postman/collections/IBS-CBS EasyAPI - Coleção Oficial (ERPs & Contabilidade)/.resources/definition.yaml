@@ -1,0 +1,5 @@
+$kind: collection
+name: IBS/CBS EasyAPI - Coleção Oficial (ERPs & Contabilidade)
+description: Coleção de testes e integração para a Reforma Tributária do Consumo (LC 214/2025 e EC 132/2023). Contém o fluxo completo dos 4 passos de emissão de NF-e com RTC e cálculos analíticos para contabilidade.
+variables:
+  baseUrl: http://localhost:3001

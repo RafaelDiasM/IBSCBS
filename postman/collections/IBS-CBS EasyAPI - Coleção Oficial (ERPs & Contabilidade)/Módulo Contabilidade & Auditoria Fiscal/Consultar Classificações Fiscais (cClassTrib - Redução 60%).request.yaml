@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/dados-abertos/classificacoes-tributarias?cst=200"
+method: GET
+queryParams:
+  cst: "200"
+order: 2000

@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/dados-abertos/ncm?ncm=24021000"
+method: GET
+queryParams:
+  ncm: "24021000"
+order: 4000

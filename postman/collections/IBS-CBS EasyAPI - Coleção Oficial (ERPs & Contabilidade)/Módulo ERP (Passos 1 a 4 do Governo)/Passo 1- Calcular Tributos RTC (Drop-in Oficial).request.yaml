@@ -1,0 +1,38 @@
+$kind: http-request
+name: "Passo 1: Calcular Tributos RTC (Drop-in Oficial)"
+url: "{{baseUrl}}/api/calculadora/regime-geral"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "dhFatoGerador": "2027-01-01T03:00:00-03:00",
+      "uf": "RS",
+      "municipio": 4314902,
+      "itens": [
+        {
+          "numero": 1,
+          "ncm": "24021000",
+          "quantidade": 222,
+          "unidade": "VN",
+          "cst": "550",
+          "baseCalculo": 1111,
+          "cClassTrib": "550020",
+          "tributacaoRegular": {
+            "cst": "200",
+            "cClassTrib": "200032"
+          },
+          "impostoSeletivo": {
+            "cst": "000",
+            "baseCalculo": 1111,
+            "cClassTrib": "000001",
+            "unidade": "VN",
+            "quantidade": 222,
+            "impostoInformado": 0
+          }
+        }
+      ]
+    }
+order: 1000

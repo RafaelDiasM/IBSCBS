@@ -1,0 +1,32 @@
+$kind: http-request
+name: "Passo 3: Validar Grupos XML da RTC"
+url: "{{baseUrl}}/api/calculadora/xml/validate?tipo=nfe&subtipo=grupo"
+method: POST
+headers:
+  Content-Type: application/xml
+queryParams:
+  tipo: nfe
+  subtipo: grupo
+body:
+  type: text
+  content: |-
+    <?xml version="1.0" encoding="UTF-8"?>
+    <gruposRTC tipo="nfe" versao="1.30" xmlns="http://www.portalfiscal.inf.br/nfe">
+      <IBSCBS>
+        <CST>000</CST>
+        <cClassTrib>000001</cClassTrib>
+        <gIBSCBS>
+          <vBC>1000.00</vBC>
+          <gCBS>
+            <pCBS>8.40</pCBS>
+            <vCBS>84.00</vCBS>
+          </gCBS>
+          <gIBSUF>
+            <pIBSUF>0.10</pIBSUF>
+            <vIBSUF>1.00</vIBSUF>
+          </gIBSUF>
+          <vIBS>1.00</vIBS>
+        </gIBSCBS>
+      </IBSCBS>
+    </gruposRTC>
+order: 3000
