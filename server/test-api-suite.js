@@ -33,13 +33,21 @@ async function testApi() {
 
   if (!isRunning) {
     console.log('⚡ Servidor offline. Inicializando instância de teste em http://localhost:3001...');
-    const isWindows = process.platform === 'win32';
-    const npmCmd = isWindows ? 'npx.cmd' : 'npx';
-    serverProcess = spawn(npmCmd, ['tsx', 'src/server.ts'], {
+    let startupLogs = '';
+    serverProcess = spawn(process.execPath, ['--import', 'tsx', 'src/server.ts'], {
       cwd: __dirname,
       stdio: 'pipe',
-      shell: isWindows,
     });
+
+    const appendStartupLog = (chunk) => {
+      startupLogs += chunk.toString();
+      if (startupLogs.length > 4000) {
+        startupLogs = startupLogs.slice(-4000);
+      }
+    };
+
+    serverProcess.stdout.on('data', appendStartupLog);
+    serverProcess.stderr.on('data', appendStartupLog);
 
     serverProcess.on('error', (err) => {
       console.error('Erro ao iniciar processo do servidor de teste:', err);
@@ -47,6 +55,9 @@ async function testApi() {
 
     const ready = await waitForServer();
     if (!ready) {
+      if (startupLogs.trim()) {
+        console.error('Logs de inicialização do servidor de teste:\n', startupLogs.trim());
+      }
       if (serverProcess) serverProcess.kill();
       console.error('❌ Falha: Servidor de teste não respondeu a tempo.');
       process.exit(1);
@@ -391,4 +402,3 @@ testApi().catch((err) => {
   console.error('Erro na execução da suíte de testes:', err);
   process.exit(1);
 });
-
