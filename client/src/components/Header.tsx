@@ -113,7 +113,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Swagger Link */}
           <a
-            href="http://localhost:3001/api/docs"
+            href="/api/docs"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 text-xs font-medium text-slate-300 transition-all"

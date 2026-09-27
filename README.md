@@ -11,6 +11,11 @@
 ![Vite](https://img.shields.io/badge/Vite-6-purple?style=for-the-badge&logo=vite)
 ![OpenAPI 3.1](https://img.shields.io/badge/OpenAPI-3.1-emerald?style=for-the-badge&logo=openapiinitiative)
 
+> 🚀 **Aplicação Online & API Pública (Deploy Gratuito no Render)**:  
+> • **Plataforma Web & Simulador Fiscal**: [https://ibscbs-easyapi.onrender.com](https://ibscbs-easyapi.onrender.com)  
+> • **Documentação Swagger UI Interativa**: [https://ibscbs-easyapi.onrender.com/api/docs](https://ibscbs-easyapi.onrender.com/api/docs)  
+> • **Endpoint de Saúde (Gateway & Governo)**: [https://ibscbs-easyapi.onrender.com/api/v1/observabilidade/health](https://ibscbs-easyapi.onrender.com/api/v1/observabilidade/health)
+
 ---
 
 ## 📌 Por que este projeto foi criado?
