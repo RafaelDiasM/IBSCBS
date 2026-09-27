@@ -88,7 +88,7 @@ export class GovernmentApiService {
     });
 
     const responseHeaders: Record<string, string> = {};
-    res.headers.forEach((val, key) => {
+    res.headers.forEach((val: string, key: string) => {
       responseHeaders[key] = val;
     });
 
@@ -105,7 +105,7 @@ export class GovernmentApiService {
     });
 
     const responseHeaders: Record<string, string> = {};
-    res.headers.forEach((val, key) => {
+    res.headers.forEach((val: string, key: string) => {
       responseHeaders[key] = val;
     });
 
