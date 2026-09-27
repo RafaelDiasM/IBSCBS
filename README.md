@@ -54,6 +54,22 @@ npm run dev
 
 ---
 
+### 🌐 Deploy Gratuito em Nuvem (Render & Docker)
+
+Você pode publicar a plataforma completa (Frontend + Backend + Swagger) gratuitamente no **Render.com** com apenas 1 clique usando o Blueprint incluído:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/RafaelDiasM/IBSCBS)
+
+#### Executando via Docker localmente:
+```bash
+# Sobe a aplicação completa (Frontend + Backend + Swagger) na porta 3001:
+docker compose up -d
+```
+Acesse: [http://localhost:3001](http://localhost:3001) (Interface Web) e [http://localhost:3001/api/docs](http://localhost:3001/api/docs) (Swagger UI).
+
+
+---
+
 ## ⚡ Exemplos de Uso da API
 
 ### 1. Cálculo Simplificado One-Shot

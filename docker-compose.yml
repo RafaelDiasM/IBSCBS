@@ -1,0 +1,14 @@
+services:
+  ibscbs-easyapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ibscbs-easyapi-hub
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - RATE_LIMIT_MAX=300
+      - GOV_API_BASE_URL=https://piloto-cbs.tributos.gov.br/servico/calculadora-consumo/api
+    restart: unless-stopped

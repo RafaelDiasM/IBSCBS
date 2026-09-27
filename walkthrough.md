@@ -134,4 +134,24 @@ Bateria de testes executada com sucesso absoluto:
 6. **Badges no `README.md`**:
    - Badges de build do GitHub Actions, testes 20/20, licença MIT, TypeScript, Node.js, React e OpenAPI 3.1.
 
+---
+
+## ☁️ Nível 2 Concluído: Blindagem de Segurança & Deploy Gratuito em Nuvem
+
+1. **Modo Fullstack Unificado (`server.ts`)**:
+   - O Express agora entrega o frontend React estático (`client/dist`) com fallback SPA em produção.
+   - Permite que toda a aplicação (Frontend + Backend + Swagger) rode num único serviço com custo zero no Render/Railway.
+2. **Rate Limiting (`express-rate-limit`)**:
+   - Proteção de até 300 requisições a cada 15 minutos por IP, com cabeçalhos padrão `RateLimit-*` e exceção para o endpoint de health check e documentação.
+3. **Segurança de Cabeçalhos HTTP (`helmet`)**:
+   - Proteção de headers HTTP contra vulnerabilidades web comuns, calibrado para suportar o Swagger UI e scripts do Vite.
+4. **Compressão Automática (`compression`)**:
+   - Respostas JSON, XML e estáticas compactadas via Gzip para máxima velocidade e menor consumo de banda do plano gratuito.
+5. **Containerização Docker (`Dockerfile` & `docker-compose.yml`)**:
+   - `Dockerfile` multi-stage com Node 20 Alpine e usuário não-root, gerando imagem enxuta e segura.
+   - `docker-compose.yml` para rodar localmente com 1 comando: `docker compose up -d`.
+6. **Deploy em 1 Clique com Render Blueprint (`render.yaml`)**:
+   - Configuração declarativa para deploy no Render.com (plano gratuito) com botão interativo no `README.md`.
+
+
 

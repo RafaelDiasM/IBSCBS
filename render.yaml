@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ibscbs-easyapi
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: npm run install:all && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/v1/observabilidade/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: RATE_LIMIT_MAX
+        value: 300
+      - key: GOV_API_BASE_URL
+        value: https://piloto-cbs.tributos.gov.br/servico/calculadora-consumo/api
